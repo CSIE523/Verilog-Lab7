@@ -1,0 +1,125 @@
+`define TimeExpire 32'd25000000
+
+module clk_div(clk,rst,div_clk);
+input clk,rst;
+output div_clk;
+
+reg div_clk;
+reg[31:0]count;
+
+always@(posedge clk or negedge rst)
+begin
+  if(!rst)
+  begin 
+  count <=32'd0;
+  div_clk<=1'b0;
+  end
+  else
+  begin
+    if(count==`TimeExpire)
+	 begin
+	    count <= 32'd0;
+		 div_clk <=~div_clk;
+		 end
+		 else
+		 begin
+		 count<=count+32'd1;
+		 end
+		end
+		end
+endmodule
+
+module moore(clk,rst,in);
+         input clk,rst;
+	 output reg [2:0]in;
+         reg [2:0]state;
+         reg [2:0]nextstate;
+         parameter S0=3'b000,S1=3'b001,S2=3'b010,S3=3'b011,S4=3'b100,S5=3'b101;
+	 always@(posedge clk or negedge rst)
+	 begin
+	 if(!rst)
+	 begin
+	    state=S0;    
+	 end
+	 else 
+	 begin 
+	 state=nextstate; 
+         end
+	 end
+         always@(in_data or state)
+         begin
+           case(state)
+           S0:begin
+              if(in_data=0)nextstate=S1;
+              else nextstate=S3;
+              end
+           S1:begin
+              if(in_data=0)nextstate=S2;
+              else nextstate=S5;
+              end
+           S2:begin
+              if(in_data=0)nextstate=S3;
+              else nextstate=S0;
+              end
+           S3:begin
+              if(in_data=0)nextstate=S4;
+              else nextstate=S1;
+              end
+           S4:begin
+              if(in_data=0)nextstate=S5;
+              else nextstate=S2;
+              end
+           S5:begin
+              if(in_data=0)nextstate=S0;
+              else nextstate=S4;
+              end
+         endcase
+         end
+         always@(state)
+         begin
+           case(state)
+            S0:in=3'd0;
+            S1:in=3'd1;
+            S2:in=3'd2;
+            S3:in=3'd3;
+            S4:in=3'd4;
+            S5:in=3'd5;
+           endcase
+         end   
+endmodule
+
+
+module sevendisplay(in,out);
+input [2:0]in;
+output reg[6:0]out;
+always@(in)
+begin
+case(in)
+		  3'd0:
+		    out=7'b1000000;
+		  3'd1:
+		    out=7'b1111001;
+		  3'd2:
+		    out=7'b0100100;
+		  3'd3:
+		    out=7'b0110000;
+		  3'd4:
+		    out=7'b0011001;
+		  3'd5:
+		    out=7'b0010010;
+	
+	endcase
+	end
+endmodule
+
+module test(rst,clk,out);
+input rst,clk;
+output [6:0]out;
+wire clock_div;
+wire in;
+
+clk_div u_Freq(.clk(clk),.rst(rst),.div_clk(clock_div));
+moore u_counter(.clk(clock_div), .rst(rst), .in(in));
+sevendisplay u_display(.in(in), .out(out));
+
+endmodule
