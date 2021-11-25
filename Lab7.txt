@@ -29,9 +29,10 @@ begin
 		end
 endmodule
 
-module moore(clk,rst,in);
+module moore(clk,rst,in_data,in);
          input clk,rst;
-	 output reg [2:0]in;
+			input in_data;
+	      output reg [2:0]in;
          reg [2:0]state;
          reg [2:0]nextstate;
          parameter S0=3'b000,S1=3'b001,S2=3'b010,S3=3'b011,S4=3'b100,S5=3'b101;
@@ -39,43 +40,43 @@ module moore(clk,rst,in);
 	 begin
 	 if(!rst)
 	 begin
-	    state=S0;    
+	    state=S0;	 
 	 end
 	 else 
 	 begin 
 	 state=nextstate; 
-         end
+    end
 	 end
-         always@(in_data or state)
-         begin
-           case(state)
+    always@(state or in_data)
+    begin
+         case(state)
            S0:begin
-              if(in_data=0)nextstate=S1;
+              if(in_data==0)nextstate=S1;
               else nextstate=S3;
               end
            S1:begin
-              if(in_data=0)nextstate=S2;
+              if(in_data==0)nextstate=S2;
               else nextstate=S5;
               end
            S2:begin
-              if(in_data=0)nextstate=S3;
+              if(in_data==0)nextstate=S3;
               else nextstate=S0;
               end
            S3:begin
-              if(in_data=0)nextstate=S4;
+              if(in_data==0)nextstate=S4;
               else nextstate=S1;
               end
            S4:begin
-              if(in_data=0)nextstate=S5;
+              if(in_data==0)nextstate=S5;
               else nextstate=S2;
               end
            S5:begin
-              if(in_data=0)nextstate=S0;
+              if(in_data==0)nextstate=S0;
               else nextstate=S4;
               end
          endcase
-         end
-         always@(state)
+        end
+    always@(state)
          begin
            case(state)
             S0:in=3'd0;
@@ -112,14 +113,14 @@ case(in)
 	end
 endmodule
 
-module test(rst,clk,out);
-input rst,clk;
+module test(rst,clk,in_data,out);
+input rst,clk,in_data;
 output [6:0]out;
 wire clock_div;
-wire in;
+wire [2:0]in;
 
 clk_div u_Freq(.clk(clk),.rst(rst),.div_clk(clock_div));
-moore u_counter(.clk(clock_div), .rst(rst), .in(in));
+moore u_counter(.clk(clock_div), .in_data(in_data), .rst(rst), .in(in));
 sevendisplay u_display(.in(in), .out(out));
 
 endmodule
