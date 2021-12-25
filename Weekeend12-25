@@ -1,0 +1,234 @@
+`define TimeExpire 32'd25000
+
+
+module clk_div(clk,rst,div_clk);
+input clk,rst;
+output reg div_clk;
+
+reg [31:0]count;
+
+always@(posedge clk or negedge rst)
+    begin 
+        if(!rst)
+        begin 
+            count <= 32'd0;
+            div_clk <= 1'b0;
+        end
+        else
+        begin 
+            if(count == `TimeExpire)
+            begin 
+                count <= 32'd0;
+                div_clk <= ~div_clk;
+            end
+            else
+            begin
+                count <= count + 32'd1;
+            end
+        end
+    end
+
+endmodule
+
+module btn_controlL(clk,rst,btnL,moveL);
+		input clk,rst,btnL;
+		output reg moveL;
+		reg [31:0]cnt;
+		always@(posedge clk or negedge rst)
+		begin
+			if(!rst)begin
+				moveL=1'b0;
+				cnt<=32'd0;
+			end
+			else begin
+				if(cnt==12500000)	begin
+					moveL=1'b1;
+					cnt<=32'd0;
+				end
+			
+			end
+		end
+endmodule
+module btn_controlR(clk,rst,btnR,moveR);
+		input clk,rst,btnR;
+		output reg moveR;
+		reg [31:0]cnt;
+
+endmodule
+
+module dot_control (clk_div,rst,moveL,moveR,dot_row,dot_col0,dot_col1);
+    input clk_div,rst;
+	 input moveL,moveR;
+    output reg [7:0] dot_row;
+	 output reg [7:0] dot_col0;
+	 output reg [7:0] dot_col1;
+	 reg [2:0] count;
+	 reg[3:0] state;
+	 always@(posedge clk_div or negedge rst)begin
+	 if(!rst)begin
+				case(count)
+				3'd0:begin dot_row<=8'b01111111;dot_col0<=8'b00011100;dot_col1<=8'b00000000;end
+				3'd1:begin dot_row<=8'b10111111;dot_col0<=8'b00010110;dot_col1<=8'b00000000;end
+				3'd2:begin dot_row<=8'b11011111;dot_col0<=8'b00011110;dot_col1<=8'b00000000;end
+				3'd3:begin dot_row<=8'b11101111;dot_col0<=8'b00111000;dot_col1<=8'b00000000;end
+				3'd4:begin dot_row<=8'b11110111;dot_col0<=8'b10111110;dot_col1<=8'b00000000;end
+				3'd5:begin dot_row<=8'b11111011;dot_col0<=8'b11111000;dot_col1<=8'b00000000;end
+				3'd6:begin dot_row<=8'b11111101;dot_col0<=8'b01111000;dot_col1<=8'b00000000;end
+				3'd7:begin dot_row<=8'b11111110;dot_col0<=8'b00101000;dot_col1<=8'b00000000;end
+				endcase
+				count<=count+1'd1;
+				state<=4'd6;
+	 end
+	 else begin
+	  case(move)
+			4'd7:begin
+			case(count)		
+				3'd0:begin dot_row<=8'b01111111;dot_col0<=8'b00001110;dot_col1<=8'b00000000;end
+				3'd1:begin dot_row<=8'b10111111;dot_col0<=8'b00001011;dot_col1<=8'b00000000;end
+				3'd2:begin dot_row<=8'b11011111;dot_col0<=8'b00001111;dot_col1<=8'b00000000;end
+				3'd3:begin dot_row<=8'b11101111;dot_col0<=8'b00011100;dot_col1<=8'b00000000;end
+				3'd4:begin dot_row<=8'b11110111;dot_col0<=8'b01011111;dot_col1<=8'b00000000;end
+				3'd5:begin dot_row<=8'b11111011;dot_col0<=8'b01111100;dot_col1<=8'b00000000;end
+				3'd6:begin dot_row<=8'b11111101;dot_col0<=8'b00111100;dot_col1<=8'b00000000;end
+				3'd7:begin dot_row<=8'b11111110;dot_col0<=8'b00010100;dot_col1<=8'b00000000;end
+			endcase
+				count<=count+1'b1;
+			end
+			4'd8:begin
+			case(count)		
+				3'd0:begin dot_row<=8'b01111111;dot_col0<=8'b00000111;dot_col1<=8'b00000000;end
+				3'd1:begin dot_row<=8'b10111111;dot_col0<=8'b00000101;dot_col1<=8'b10000000;end
+				3'd2:begin dot_row<=8'b11011111;dot_col0<=8'b00000111;dot_col1<=8'b10000000;end
+				3'd3:begin dot_row<=8'b11101111;dot_col0<=8'b00001110;dot_col1<=8'b00000000;end
+				3'd4:begin dot_row<=8'b11110111;dot_col0<=8'b00101111;dot_col1<=8'b10000000;end
+				3'd5:begin dot_row<=8'b11111011;dot_col0<=8'b00111110;dot_col1<=8'b00000000;end
+				3'd6:begin dot_row<=8'b11111101;dot_col0<=8'b00011110;dot_col1<=8'b00000000;end
+				3'd7:begin dot_row<=8'b11111110;dot_col0<=8'b00001010;dot_col1<=8'b00000000;end
+			endcase
+				count<=count+1'b1;
+			end
+			4'd9:begin
+			case(count)		
+				3'd0:begin dot_row<=8'b01111111;dot_col0<=8'b00000011;dot_col1<=8'b10000000;end
+				3'd1:begin dot_row<=8'b10111111;dot_col0<=8'b00000010;dot_col1<=8'b11000000;end
+				3'd2:begin dot_row<=8'b11011111;dot_col0<=8'b00000011;dot_col1<=8'b11000000;end
+				3'd3:begin dot_row<=8'b11101111;dot_col0<=8'b00000111;dot_col1<=8'b00000000;end
+				3'd4:begin dot_row<=8'b11110111;dot_col0<=8'b00010111;dot_col1<=8'b11000000;end
+				3'd5:begin dot_row<=8'b11111011;dot_col0<=8'b00011111;dot_col1<=8'b00000000;end
+				3'd6:begin dot_row<=8'b11111101;dot_col0<=8'b00001111;dot_col1<=8'b00000000;end
+				3'd7:begin dot_row<=8'b11111110;dot_col0<=8'b00000101;dot_col1<=8'b00000000;end
+			endcase
+				count<=count+1'b1;
+			end
+			4'd10:begin
+			case(count)		
+				3'd0:begin dot_row<=8'b01111111;dot_col0<=8'b00000001;dot_col1<=8'b11000000;end
+				3'd1:begin dot_row<=8'b10111111;dot_col0<=8'b00000001;dot_col1<=8'b01100000;end
+				3'd2:begin dot_row<=8'b11011111;dot_col0<=8'b00000001;dot_col1<=8'b11100000;end
+				3'd3:begin dot_row<=8'b11101111;dot_col0<=8'b00000011;dot_col1<=8'b10000000;end
+				3'd4:begin dot_row<=8'b11110111;dot_col0<=8'b00001011;dot_col1<=8'b11100000;end
+				3'd5:begin dot_row<=8'b11111011;dot_col0<=8'b00001111;dot_col1<=8'b10000000;end
+				3'd6:begin dot_row<=8'b11111101;dot_col0<=8'b00000111;dot_col1<=8'b10000000;end
+				3'd7:begin dot_row<=8'b11111110;dot_col0<=8'b00000010;dot_col1<=8'b10000000;end
+			endcase
+				count<=count+1'b1;
+			end
+			4'd11:begin
+			case(count)		
+				3'd0:begin dot_row<=8'b01111111;dot_col0<=8'b00000000;dot_col1<=8'b11100000;end
+				3'd1:begin dot_row<=8'b10111111;dot_col0<=8'b00000000;dot_col1<=8'b10110000;end
+				3'd2:begin dot_row<=8'b11011111;dot_col0<=8'b00000000;dot_col1<=8'b11110000;end
+				3'd3:begin dot_row<=8'b11101111;dot_col0<=8'b00000001;dot_col1<=8'b11000000;end
+				3'd4:begin dot_row<=8'b11110111;dot_col0<=8'b00000101;dot_col1<=8'b11110000;end
+				3'd5:begin dot_row<=8'b11111011;dot_col0<=8'b00000111;dot_col1<=8'b11000000;end
+				3'd6:begin dot_row<=8'b11111101;dot_col0<=8'b00000011;dot_col1<=8'b11000000;end
+				3'd7:begin dot_row<=8'b11111110;dot_col0<=8'b00000001;dot_col1<=8'b01000000;end
+			endcase
+				count<=count+1'b1;
+			end
+			4'd12:begin
+			case(count)		
+				3'd0:begin dot_row<=8'b01111111;dot_col0<=8'b00000000;dot_col1<=8'b01110000;end
+				3'd1:begin dot_row<=8'b10111111;dot_col0<=8'b00000000;dot_col1<=8'b01011000;end
+				3'd2:begin dot_row<=8'b11011111;dot_col0<=8'b00000000;dot_col1<=8'b01111000;end
+				3'd3:begin dot_row<=8'b11101111;dot_col0<=8'b00000000;dot_col1<=8'b11100000;end
+				3'd4:begin dot_row<=8'b11110111;dot_col0<=8'b00000010;dot_col1<=8'b11111000;end
+				3'd5:begin dot_row<=8'b11111011;dot_col0<=8'b00000011;dot_col1<=8'b11100000;end
+				3'd6:begin dot_row<=8'b11111101;dot_col0<=8'b00000001;dot_col1<=8'b11100000;end
+				3'd7:begin dot_row<=8'b11111110;dot_col0<=8'b00000000;dot_col1<=8'b10100000;end
+			endcase
+				count<=count+1'b1;
+			end
+			4'd13:begin
+			case(count)		
+				3'd0:begin dot_row<=8'b01111111;dot_col0<=8'b00000000;dot_col1<=8'b00111000;end
+				3'd1:begin dot_row<=8'b10111111;dot_col0<=8'b00000000;dot_col1<=8'b00101100;end
+				3'd2:begin dot_row<=8'b11011111;dot_col0<=8'b00000000;dot_col1<=8'b00111100;end
+				3'd3:begin dot_row<=8'b11101111;dot_col0<=8'b00000000;dot_col1<=8'b01110000;end
+				3'd4:begin dot_row<=8'b11110111;dot_col0<=8'b00000001;dot_col1<=8'b01111100;end
+				3'd5:begin dot_row<=8'b11111011;dot_col0<=8'b00000001;dot_col1<=8'b11110000;end
+				3'd6:begin dot_row<=8'b11111101;dot_col0<=8'b00000000;dot_col1<=8'b11110000;end
+				3'd7:begin dot_row<=8'b11111110;dot_col0<=8'b00000000;dot_col1<=8'b01010000;end
+			endcase
+				count<=count+1'b1;
+			end
+			4'd14:begin
+			case(count)		
+				3'd0:begin dot_row<=8'b01111111;dot_col0<=8'b00000000;dot_col1<=8'b00011100;end
+				3'd1:begin dot_row<=8'b10111111;dot_col0<=8'b00000000;dot_col1<=8'b00010110;end
+				3'd2:begin dot_row<=8'b11011111;dot_col0<=8'b00000000;dot_col1<=8'b00011110;end
+				3'd3:begin dot_row<=8'b11101111;dot_col0<=8'b00000000;dot_col1<=8'b00111000;end
+				3'd4:begin dot_row<=8'b11110111;dot_col0<=8'b00000000;dot_col1<=8'b10111110;end
+				3'd5:begin dot_row<=8'b11111011;dot_col0<=8'b00000000;dot_col1<=8'b11111000;end
+				3'd6:begin dot_row<=8'b11111101;dot_col0<=8'b00000000;dot_col1<=8'b01111000;end
+				3'd7:begin dot_row<=8'b11111110;dot_col0<=8'b00000000;dot_col1<=8'b00101000;end
+			endcase
+				count<=count+1'b1;
+			end
+			4'd15:begin
+			case(count)		
+				3'd0:begin dot_row<=8'b01111111;dot_col0<=8'b00000000;dot_col1<=8'b00001110;end
+				3'd1:begin dot_row<=8'b10111111;dot_col0<=8'b00000000;dot_col1<=8'b00001011;end
+				3'd2:begin dot_row<=8'b11011111;dot_col0<=8'b00000000;dot_col1<=8'b00001111;end
+				3'd3:begin dot_row<=8'b11101111;dot_col0<=8'b00000000;dot_col1<=8'b00011100;end
+				3'd4:begin dot_row<=8'b11110111;dot_col0<=8'b00000000;dot_col1<=8'b01011111;end
+				3'd5:begin dot_row<=8'b11111011;dot_col0<=8'b00000000;dot_col1<=8'b01111100;end
+				3'd6:begin dot_row<=8'b11111101;dot_col0<=8'b00000000;dot_col1<=8'b00111100;end
+				3'd7:begin dot_row<=8'b11111110;dot_col0<=8'b00000000;dot_col1<=8'b00010100;end
+			endcase
+				count<=count+1'b1;
+			end
+			default:
+				case(count)		
+				3'd0:begin dot_row<=8'b01111111;dot_col0<=8'b00001110;dot_col1<=8'b00000000;end
+				3'd1:begin dot_row<=8'b10111111;dot_col0<=8'b00001011;dot_col1<=8'b00000000;end
+				3'd2:begin dot_row<=8'b11011111;dot_col0<=8'b00001111;dot_col1<=8'b00000000;end
+				3'd3:begin dot_row<=8'b11101111;dot_col0<=8'b00011100;dot_col1<=8'b00000000;end
+				3'd4:begin dot_row<=8'b11110111;dot_col0<=8'b01011111;dot_col1<=8'b00000000;end
+				3'd5:begin dot_row<=8'b11111011;dot_col0<=8'b01111100;dot_col1<=8'b00000000;end
+				3'd6:begin dot_row<=8'b11111101;dot_col0<=8'b00111100;dot_col1<=8'b00000000;end
+				3'd7:begin dot_row<=8'b11111110;dot_col0<=8'b00010100;dot_col1<=8'b00000000;end
+			endcase
+				count<=count+1'b1;
+		 endcase
+	 
+	 end
+
+end
+endmodule
+
+
+module test(rst,clk,btn1,btn0,dot_row,dot_col0);
+input rst,clk;
+input btn1,btn0;
+output [7:0]dot_row;
+output [7:0]dot_col0;
+output [7:0]dot_col1;
+wire clock_div;
+wire [3:0]move;
+
+clk_div clkd(.clk(clk),.rst(rst),.div_clk(clock_div));
+btn_control(.clk(clk),.rst(rst),.btn_signal(),.move(move));
+dot_control dot(.clk_div(clock_div),.rst(rst),.dot_row(dot_row),.dot_col0(dot_col0),.dot_col1(dot_col1));
+
+endmodule
